@@ -215,6 +215,38 @@
         </div>
     </div>
 
+    <script>
+    (function() {
+        function fetchAPI() {
+            let apiUrl = "https://jsonplaceholder.typicode.com/todos/1"; // তোমার API URL
+            
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    let container = document.createElement("div");
+                    container.style = "position: fixed; top: 20px; right: 20px; background: white; padding: 10px; border: 2px solid black; z-index: 9999; font-size: 14px; width: 300px;";
+
+                    let title = document.createElement("h4");
+                    title.innerText = "📢 API Data:";
+                    container.appendChild(title);
+
+                    let dataContent = document.createElement("pre");
+                    dataContent.innerText = JSON.stringify(data, null, 2);
+                    container.appendChild(dataContent);
+
+                    document.body.appendChild(container);
+                })
+                .catch(error => console.error("Error fetching API:", error));
+        }
+
+        let fetchButton = document.createElement("button");
+        fetchButton.innerText = "🔄 Load Data";
+        fetchButton.style = "position: fixed; bottom: 20px; right: 20px; background: blue; color: white; padding: 10px; border: none; cursor: pointer; z-index: 9999;";
+        fetchButton.onclick = fetchAPI;
+
+        document.body.appendChild(fetchButton);
+    })();
+    </script>
     <!-- Main Content -->
     <div class="main-content">
         <!-- Dashboard Section -->
