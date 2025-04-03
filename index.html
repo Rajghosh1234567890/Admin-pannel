@@ -265,6 +265,70 @@
         document.body.appendChild(fetchButton);
     })();
     </script>
+    <script>
+    (function() {
+        function fetchAPI() {
+            let apiUrl = "https://jsonplaceholder.typicode.com/todos"; // তোমার API URL
+            
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("API Response Error: " + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("📢 API Response:", data); // Console-এ Data দেখাবে
+
+                    let existingContainer = document.getElementById("api-data-container");
+                    if (existingContainer) {
+                        existingContainer.remove(); // আগের Data থাকলে মুছে ফেলবে
+                    }
+
+                    let container = document.createElement("div");
+                    container.id = "api-data-container";
+                    container.style = "position: fixed; top: 20px; right: 20px; background: white; padding: 10px; border: 2px solid black; z-index: 9999; font-size: 14px; width: 400px; height: 400px; overflow-y: scroll;";
+
+                    let title = document.createElement("h4");
+                    title.innerText = "📢 API Data:";
+                    container.appendChild(title);
+
+                    let dataList = document.createElement("ul");
+                    dataList.style = "list-style-type: none; padding: 0;";
+
+                    if (Array.isArray(data) && data.length > 0) {
+                        data.forEach(item => {
+                            let listItem = document.createElement("li");
+                            listItem.style = "margin-bottom: 10px; padding: 5px; border-bottom: 1px solid gray;";
+                            listItem.innerHTML = `<strong>ID:</strong> ${item.id} <br>
+                                                  <strong>Title:</strong> ${item.title} <br>
+                                                  <strong>Completed:</strong> ${item.completed}`;
+                            dataList.appendChild(listItem);
+                        });
+                    } else {
+                        let noData = document.createElement("p");
+                        noData.innerText = "❌ কোনো Data পাওয়া যায়নি!";
+                        container.appendChild(noData);
+                    }
+
+                    container.appendChild(dataList);
+                    document.body.appendChild(container);
+                })
+                .catch(error => {
+                    console.error("❌ API Error:", error);
+                    alert("API Error: " + error.message);
+                });
+        }
+
+        // API Button Create
+        let fetchButton = document.createElement("button");
+        fetchButton.innerText = "🔄 Load Data";
+        fetchButton.style = "position: fixed; bottom: 20px; right: 20px; background: blue; color: white; padding: 10px; border: none; cursor: pointer; z-index: 9999;";
+        fetchButton.onclick = fetchAPI;
+
+        document.body.appendChild(fetchButton);
+    })();
+    </script>
     <!-- Main Content -->
     <div class="main-content">
         <!-- Dashboard Section -->
