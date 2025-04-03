@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProSMM - Admin Panel</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --success: #00b894;
+            --danger: #d63031;
+            --warning: #fdcb6e;
+            --info: #0984e3;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            position: fixed;
+            width: 250px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 5px;
+            border-radius: 5px;
+            padding: 10px 15px;
+        }
+        
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .stat-card {
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card .card-body {
+            padding: 25px;
+        }
+        
+        .stat-card .icon {
+            font-size: 40px;
+            opacity: 0.3;
+            position: absolute;
+            right: 20px;
+            top: 20px;
+        }
+        
+        .card-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .card-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .card-info {
+            background-color: var(--info);
+            color: white;
+        }
+        
+        .card-warning {
+            background-color: var(--warning);
+            color: var(--dark);
+        }
+        
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .table th {
+            background-color: var(--light);
+            border-top: none;
+        }
+        
+        .badge {
+            padding: 6px 10px;
+            font-weight: 500;
+        }
+        
+        .apexcharts-tooltip {
+            background: #fff !important;
+            color: var(--dark);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+            border-radius: 10px !important;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+                overflow: hidden;
+            }
+            
+            .sidebar .nav-link span {
+                display: none;
+            }
+            
+            .sidebar .nav-link i {
+                margin-right: 0;
+                font-size: 1.2rem;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="d-flex flex-column p-3">
+            <a href="#" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                <span class="fs-4">ProSMM</span>
+            </a>
+            <hr>
+            <ul class="nav nav-pills flex-column mb-auto">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" onclick="showSection('dashboard')">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" onclick="showSection('users')">
+                        <i class="fas fa-users"></i>
+                        <span>Users</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" onclick="showSection('services')">
+                        <i class="fas fa-list"></i>
+                        <span>Services</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" onclick="showSection('orders')">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Orders</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" onclick="showSection('api')">
+                        <i class="fas fa-plug"></i>
+                        <span>API</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" onclick="showSection('reports')">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Reports</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" onclick="showSection('settings')">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+            <hr>
+            <div class="dropdown">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="https://via.placeholder.com/40" alt="Admin" width="32" height="32" class="rounded-circle me-2">
+                    <strong>Admin</strong>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><a class="dropdown-item" href="#">Settings</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#">Sign out</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Dashboard Section -->
+        <div id="dashboard-section">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Dashboard</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group me-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+                        <i class="fas fa-calendar"></i> This week
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="stat-card card-primary">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Users</h5>
+                            <h2 class="card-text" id="total-users">0</h2>
+                            <p class="card-text"><small>+12% from last month</small></p>
+                            <i class="fas fa-users icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card card-success">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Orders</h5>
+                            <h2 class="card-text" id="total-orders">0</h2>
+                            <p class="card-text"><small>+24% from last month</small></p>
+                            <i class="fas fa-shopping-cart icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card card-info">
+                        <div class="card-body">
+                            <h5 class="card-title">Revenue</h5>
+                            <h2 class="card-text" id="total-revenue">$0</h2>
+                            <p class="card-text"><small>+18% from last month</small></p>
+                            <i class="fas fa-dollar-sign icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card card-warning">
+                        <div class="card-body">
+                            <h5 class="card-title">Active Services</h5>
+                            <h2 class="card-text" id="active-services">0</h2>
+                            <p class="card-text"><small>+5 new this month</small></p>
+                            <i class="fas fa-list icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="row mt-4">
+                <div class="col-md-8">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5>Revenue Overview</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="revenue-chart" style="height: 300px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5>Order Status</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="order-status-chart" style="height: 300px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Recent Orders</h5>
+                    <a href="#" class="btn btn-sm btn-primary" onclick="showSection('orders')">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Service</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-orders">
+                                <!-- Filled by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Other Sections (initially hidden) -->
+        <div id="users-section" style="display: none;">
+            <!-- Users Management Content -->
+        </div>
+        
+        <div id="services-section" style="display: none;">
+            <!-- Services Management Content -->
+        </div>
+        
+        <div id="orders-section" style="display: none;">
+            <!-- Orders Management Content -->
+        </div>
+        
+        <div id="api-section" style="display: none;">
+            <!-- API Management Content -->
+        </div>
+        
+        <div id="reports-section" style="display: none;">
+            <!-- Reports Content -->
+        </div>
+        
+        <div id="settings-section" style="display: none;">
+            <!-- Settings Content -->
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <!-- Custom JavaScript -->
+    <script>
+        // Database (using localStorage for persistence)
+        let db = {
+            users: JSON.parse(localStorage.getItem('prosmm_users')) || [
+                { id: 1, username: 'admin', email: 'admin@prosmm.com', role: 'admin', balance: 1000, createdAt: new Date().toISOString() },
+                { id: 2, username: 'reseller1', email: 'reseller@prosmm.com', role: 'reseller', balance: 500, createdAt: new Date().toISOString() },
+                { id: 3, username: 'customer1', email: 'customer@prosmm.com', role: 'customer', balance: 100, createdAt: new Date().toISOString() }
+            ],
+            services: JSON.parse(localStorage.getItem('prosmm_services')) || [
+                { id: 1, name: 'Instagram Followers', category: 'Instagram', rate: 0.50, min: 100, max: 10000, status: 'active', description: 'High quality followers' },
+                { id: 2, name: 'YouTube Views', category: 'YouTube', rate: 1.00, min: 100, max: 50000, status: 'active', description: 'Real views with retention' },
+                { id: 3, name: 'Twitter Likes', category: 'Twitter', rate: 0.30, min: 50, max: 10000, status: 'inactive', description: 'Premium twitter likes' }
+            ],
+            orders: JSON.parse(localStorage.getItem('prosmm_orders')) || [
+                { id: 1, userId: 3, serviceId: 1, quantity: 1000, amount: 500, status: 'completed', createdAt: new Date().toISOString() },
+                { id: 2, userId: 2, serviceId: 2, quantity: 5000, amount: 5000, status: 'processing', createdAt: new Date().toISOString() },
+                { id: 3, userId: 3, serviceId: 1, quantity: 2000, amount: 1000, status: 'pending', createdAt: new Date().toISOString() },
+                { id: 4, userId: 1, serviceId: 3, quantity: 1000, amount: 300, status: 'failed', createdAt: new Date().toISOString() }
+            ],
+            settings: JSON.parse(localStorage.getItem('prosmm_settings')) || {
+                apiKey: 'PROSMM-' + Math.random().toString(36).substr(2, 16).toUpperCase(),
+                currency: 'USD',
+                smmApiUrl: 'https://api.smmprovider.com/v1'
+            }
+        };
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('prosmm_users', JSON.stringify(db.users));
+            localStorage.setItem('prosmm_services', JSON.stringify(db.services));
+            localStorage.setItem('prosmm_orders', JSON.stringify(db.orders));
+            localStorage.setItem('prosmm_settings', JSON.stringify(db.settings));
+        }
+
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDashboard();
+            initCharts();
+            
+            // Simulate real-time updates
+            setInterval(updateDashboard, 5000);
+        });
+
+        // Update dashboard stats
+        function updateDashboard() {
+            // Update stats cards
+            document.getElementById('total-users').textContent = db.users.length;
+            document.getElementById('total-orders').textContent = db.orders.length;
+            document.getElementById('total-revenue').textContent = '$' + 
+                db.orders.reduce((sum, order) => sum + (order.status === 'completed' ? order.amount : 0), 0).toFixed(2);
+            document.getElementById('active-services').textContent = 
+                db.services.filter(service => service.status === 'active').length;
+            
+            // Update recent orders table
+            const recentOrders = db.orders.slice(0, 5).reverse();
+            const tbody = document.getElementById('recent-orders');
+            tbody.innerHTML = '';
+            
+            recentOrders.forEach(order => {
+                const user = db.users.find(u => u.id === order.userId);
+                const service = db.services.find(s => s.id === order.serviceId);
+                const date = new Date(order.createdAt).toLocaleString();
+                
+                let statusClass = '';
+                if (order.status === 'completed') statusClass = 'bg-success';
+                else if (order.status === 'processing') statusClass = 'bg-primary';
+                else if (order.status === 'pending') statusClass = 'bg-warning';
+                else if (order.status === 'failed') statusClass = 'bg-danger';
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>#${order.id}</td>
+                        <td>${user ? user.username : 'Deleted User'}</td>
+                        <td>${service ? service.name : 'Deleted Service'}</td>
+                        <td>$${order.amount.toFixed(2)}</td>
+                        <td><span class="badge ${statusClass}">${order.status}</span></td>
+                        <td>${date}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Initialize charts
+        function initCharts() {
+            // Revenue chart
+            const revenueChart = new ApexCharts(document.querySelector("#revenue-chart"), {
+                series: [{
+                    name: 'Revenue',
+                    data: [300, 400, 600, 800, 1200, 1800, 2100]
+                }],
+                chart: {
+                    height: 350,
+                    type: 'area',
+                    toolbar: {
+                        show: false
+                    }
+                },
+                colors: ['var(--primary)'],
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    curve: 'smooth'
+                },
+                xaxis: {
+                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul']
+                },
+                tooltip: {
+                    y: {
+                        formatter: function (val) {
+                            return "$" + val
+                        }
+                    }
+                }
+            });
+            revenueChart.render();
+            
+            // Order status chart
+            const orderStatusChart = new ApexCharts(document.querySelector("#order-status-chart"), {
+                series: [44, 55, 13, 33],
+                chart: {
+                    type: 'donut',
+                },
+                labels: ['Completed', 'Processing', 'Pending', 'Failed'],
+                colors: ['var(--success)', 'var(--primary)', 'var(--warning)', 'var(--danger)'],
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 200
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }]
+            });
+            orderStatusChart.render();
+        }
+
+        // Show section
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.main-content > div').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId + '-section').style.display = 'block';
+            
+            // Update active nav link
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Load section content if needed
+            switch(sectionId) {
+                case 'dashboard':
+                    updateDashboard();
+                    break;
+                case 'users':
+                    loadUsersSection();
+                    break;
+                case 'services':
+                    loadServicesSection();
+                    break;
+                case 'orders':
+                    loadOrdersSection();
+                    break;
+                case 'api':
+                    loadApiSection();
+                    break;
+            }
+        }
+
+        // Load users section
+        function loadUsersSection() {
+            const section = document.getElementById('users-section');
+            section.innerHTML = `
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">User Management</h1>
+                    <button class="btn btn-primary" onclick="showUserModal()">
+                        <i class="fas fa-plus"></i> Add User
+                    </button>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Balance</th>
+                                        <th>Joined</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table">
+                                    <!-- Filled by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- User Modal -->
+                <div class="modal fade" id="userModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="userModalTitle">Add User</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="userForm">
+                                    <input type="hidden" id="userId">
+                                    <div class="mb-3">
+                                        <label for="username" class="form-label">Username</label>
+                                        <input type="text" class="form-control" id="username" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="email" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="password" class="form-label">Password</label>
+                                        <input type="password" class="form-control" id="password">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="role" class="form-label">Role</label>
+                                        <select class="form-select" id="role" required>
+                                            <option value="admin">Admin</option>
+                                            <option value="reseller">Reseller</option>
+                                            <option value="customer">Customer</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="balance" class="form-label">Balance</label>
+                                        <input type="number" class="form-control" id="balance" value="0" required>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" onclick="saveUser()">Save User</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Render users table
+            renderUsersTable();
+        }
+
+        // Render users table
+        function renderUsersTable() {
+            const tbody = document.getElementById('users-table');
+            tbody.innerHTML = '';
+            
+            db.users.forEach(user => {
+                const date = new Date(user.createdAt).toLocaleDateString();
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${user.username}</td>
+                        <td>${user.email}</td>
+                        <td><span class="badge ${user.role === 'admin' ? 'bg-danger' : user.role === 'reseller' ? 'bg-primary' : 'bg-secondary'}">${user.role}</span></td>
+                        <td>$${user.balance.toFixed(2)}</td>
+                        <td>${date}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="editUser(${user.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Show user modal
+        function showUserModal(userId = null) {
+            const modal = new bootstrap.Modal(document.getElementById('userModal'));
+            const form = document.getElementById('userForm');
+            
+            if (userId) {
+                // Edit mode
+                document.getElementById('userModalTitle').textContent = 'Edit User';
+                const user = db.users.find(u => u.id === userId);
+                
+                document.getElementById('userId').value = user.id;
+                document.getElementById('username').value = user.username;
+                document.getElementById('email').value = user.email;
+                document.getElementById('role').value = user.role;
+                document.getElementById('balance').value = user.balance;
+                document.getElementById('password').required = false;
+            } else {
+                // Add mode
+                document.getElementById('userModalTitle').textContent = 'Add User';
+                form.reset();
+                document.getElementById('password').required = true;
+            }
+            
+            modal.show();
+        }
+
+        // Save user
+        function saveUser() {
+            const form = document.getElementById('userForm');
+            const userId = document.getElementById('userId').value;
+            const isEdit = !!userId;
+            
+            const userData = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                role: document.getElementById('role').value,
+                balance: parseFloat(document.getElementById('balance').value),
+                createdAt: new Date().toISOString()
+            };
+            
+            if (!isEdit) {
+                userData.password = document.getElementById('password').value;
+                userData.id = db.users.length > 0 ? Math.max(...db.users.map(u => u.id)) + 1 : 1;
+                db.users.push(userData);
+            } else {
+                const userIndex = db.users.findIndex(u => u.id === parseInt(userId));
+                if (userIndex !== -1) {
+                    const password = document.getElementById('password').value;
+                    if (password) {
+                        userData.password = password;
+                    }
+                    db.users[userIndex] = { ...db.users[userIndex], ...userData };
+                }
+            }
+            
+            saveData();
+            renderUsersTable();
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('userModal'));
+            modal.hide();
+            
+            alert(`User ${isEdit ? 'updated' : 'added'} successfully!`);
+        }
+
+        // Edit user
+        function editUser(userId) {
+            showUserModal(userId);
+        }
+
+        // Delete user
+        function deleteUser(userId) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                db.users = db.users.filter(u => u.id !== userId);
+                saveData();
+                renderUsersTable();
+                alert('User deleted successfully!');
+            }
+        }
+
+        // Load services section
+        function loadServicesSection() {
+            const section = document.getElementById('services-section');
+            section.innerHTML = `
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Service Management</h1>
+                    <button class="btn btn-primary" onclick="showServiceModal()">
+                        <i class="fas fa-plus"></i> Add Service
+                    </button>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Category</th>
+                                        <th>Rate</th>
+                                        <th>Min/Max</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="services-table">
+                                    <!-- Filled by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Service Modal -->
+                <div class="modal fade" id="serviceModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="serviceModalTitle">Add Service</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="serviceForm">
+                                    <input type="hidden" id="serviceId">
+                                    <div class="mb-3">
+                                        <label for="serviceName" class="form-label">Service Name</label>
+                                        <input type="text" class="form-control" id="serviceName" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="category" class="form-label">Category</label>
+                                        <input type="text" class="form-control" id="category" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label">Description</label>
+                                        <textarea class="form-control" id="description" rows="3"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="rate" class="form-label">Rate (per 1000)</label>
+                                        <input type="number" step="0.01" class="form-control" id="rate" required>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="min" class="form-label">Min Quantity</label>
+                                            <input type="number" class="form-control" id="min" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="max" class="form-label">Max Quantity</label>
+                                            <input type="number" class="form-control" id="max" required>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="serviceStatus" class="form-label">Status</label>
+                                        <select class="form-select" id="serviceStatus" required>
+                                            <option value="active">Active</option>
+                                            <option value="inactive">Inactive</option>
+                                        </select>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" onclick="saveService()">Save Service</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Render services table
+            renderServicesTable();
+        }
+
+        // Render services table
+        function renderServicesTable() {
+            const tbody = document.getElementById('services-table');
+            tbody.innerHTML = '';
+            
+            db.services.forEach(service => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${service.id}</td>
+                        <td>${service.name}</td>
+                        <td>${service.category}</td>
+                        <td>$${service.rate.toFixed(2)}</td>
+                        <td>${service.min}/${service.max}</td>
+                        <td><span class="badge ${service.status === 'active' ? 'bg-success' : 'bg-secondary'}">${service.status}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="editService(${service.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteService(${service.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Show service modal
+        function showServiceModal(serviceId = null) {
+            const modal = new bootstrap.Modal(document.getElementById('serviceModal'));
+            const form = document.getElementById('serviceForm');
+            
+            if (serviceId) {
+                // Edit mode
+                document.getElementById('serviceModalTitle').textContent = 'Edit Service';
+                const service = db.services.find(s => s.id === serviceId);
+                
+                document.getElementById('serviceId').value = service.id;
+                document.getElementById('serviceName').value = service.name;
+                document.getElementById('category').value = service.category;
+                document.getElementById('description').value = service.description || '';
+                document.getElementById('rate').value = service.rate;
+                document.getElementById('min').value = service.min;
+                document.getElementById('max').value = service.max;
+                document.getElementById('serviceStatus').value = service.status;
+            } else {
+                // Add mode
+                document.getElementById('serviceModalTitle').textContent = 'Add Service';
+                form.reset();
+            }
+            
+            modal.show();
+        }
+
+        // Save service
+        function saveService() {
+            const form = document.getElementById('serviceForm');
+            const serviceId = document.getElementById('serviceId').value;
+            const isEdit = !!serviceId;
+            
+            const serviceData = {
+                name: document.getElementById('serviceName').value,
+                category: document.getElementById('category').value,
+                description: document.getElementById('description').value,
+                rate: parseFloat(document.getElementById('rate').value),
+                min: parseInt(document.getElementById('min').value),
+                max: parseInt(document.getElementById('max').value),
+                status: document.getElementById('serviceStatus').value
+            };
+            
+            if (!isEdit) {
+                serviceData.id = db.services.length > 0 ? Math.max(...db.services.map(s => s.id)) + 1 : 1;
+                db.services.push(serviceData);
+            } else {
+                const serviceIndex = db.services.findIndex(s => s.id === parseInt(serviceId));
+                if (serviceIndex !== -1) {
+                    db.services[serviceIndex] = { ...db.services[serviceIndex], ...serviceData };
+                }
+            }
+            
+            saveData();
+            renderServicesTable();
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('serviceModal'));
+            modal.hide();
+            
+            alert(`Service ${isEdit ? 'updated' : 'added'} successfully!`);
+        }
+
+        // Edit service
+        function editService(serviceId) {
+            showServiceModal(serviceId);
+        }
+
+        // Delete service
+        function deleteService(serviceId) {
+            if (confirm('Are you sure you want to delete this service?')) {
+                db.services = db.services.filter(s => s.id !== serviceId);
+                saveData();
+                renderServicesTable();
+                alert('Service deleted successfully!');
+            }
+        }
+
+        // Load orders section
+        function loadOrdersSection() {
+            const section = document.getElementById('orders-section');
+            section.innerHTML = `
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Order Management</h1>
+                    <div class="btn-group">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            Filter: All
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="filterOrders('all')">All Orders</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="filterOrders('completed')">Completed</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="filterOrders('processing')">Processing</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="filterOrders('pending')">Pending</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="filterOrders('failed')">Failed</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Customer</th>
+                                        <th>Service</th>
+                                        <th>Quantity</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="orders-table">
+                                    <!-- Filled by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Order Modal -->
+                <div class="modal fade" id="orderModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="orderModalTitle">Order Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body" id="orderModalBody">
+                                <!-- Filled by JavaScript -->
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" id="orderActionBtn" style="display: none;">Process Order</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Render orders table
+            renderOrdersTable();
+        }
+
+        // Render orders table
+        function renderOrdersTable(filter = 'all') {
+            const tbody = document.getElementById('orders-table');
+            tbody.innerHTML = '';
+            
+            let orders = db.orders;
+            if (filter !== 'all') {
+                orders = orders.filter(o => o.status === filter);
+            }
+            
+            orders.reverse().forEach(order => {
+                const user = db.users.find(u => u.id === order.userId);
+                const service = db.services.find(s => s.id === order.serviceId);
+                const date = new Date(order.createdAt).toLocaleString();
+                
+                let statusClass = '';
+                if (order.status === 'completed') statusClass = 'bg-success';
+                else if (order.status === 'processing') statusClass = 'bg-primary';
+                else if (order.status === 'pending') statusClass = 'bg-warning';
+                else if (order.status === 'failed') statusClass = 'bg-danger';
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>#${order.id}</td>
+                        <td>${user ? user.username : 'Deleted User'}</td>
+                        <td>${service ? service.name : 'Deleted Service'}</td>
+                        <td>${order.quantity}</td>
+                        <td>$${order.amount.toFixed(2)}</td>
+                        <td><span class="badge ${statusClass}">${order.status}</span></td>
+                        <td>${date}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="viewOrder(${order.id})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            ${order.status === 'pending' ? `
+                            <button class="btn btn-sm btn-success" onclick="processOrder(${order.id})">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Filter orders
+        function filterOrders(status) {
+            renderOrdersTable(status);
+            document.querySelector('#orders-section .dropdown-toggle').textContent = `Filter: ${status.charAt(0).toUpperCase() + status.slice(1)}`;
+        }
+
+        // View order details
+        function viewOrder(orderId) {
+            const order = db.orders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            const user = db.users.find(u => u.id === order.userId);
+            const service = db.services.find(s => s.id === order.serviceId);
+            const date = new Date(order.createdAt).toLocaleString();
+            
+            document.getElementById('orderModalTitle').textContent = `Order #${order.id}`;
+            document.getElementById('orderModalBody').innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Order Information</h5>
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>Order ID</th>
+                                <td>#${order.id}</td>
+                            </tr>
+                            <tr>
+                                <th>Date</th>
+                                <td>${date}</td>
+                            </tr>
+                            <tr>
+                                <th>Status</th>
+                                <td><span class="badge ${order.status === 'completed' ? 'bg-success' : 
+                                    order.status === 'processing' ? 'bg-primary' : 
+                                    order.status === 'pending' ? 'bg-warning' : 'bg-danger'}">${order.status}</span></td>
+                            </tr>
+                            <tr>
+                                <th>Amount</th>
+                                <td>$${order.amount.toFixed(2)}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Customer Information</h5>
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>Username</th>
+                                <td>${user ? user.username : 'Deleted User'}</td>
+                            </tr>
+                            <tr>
+                                <th>Email</th>
+                                <td>${user ? user.email : 'N/A'}</td>
+                            </tr>
+                            <tr>
+                                <th>Balance</th>
+                                <td>$${user ? user.balance.toFixed(2) : 'N/A'}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h5>Service Information</h5>
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>Service Name</th>
+                                <td>${service ? service.name : 'Deleted Service'}</td>
+                            </tr>
+                            <tr>
+                                <th>Category</th>
+                                <td>${service ? service.category : 'N/A'}</td>
+                            </tr>
+                            <tr>
+                                <th>Rate</th>
+                                <td>$${service ? service.rate.toFixed(2) : 'N/A'} per 1000</td>
+                            </tr>
+                            <tr>
+                                <th>Quantity</th>
+                                <td>${order.quantity}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            `;
+            
+            const actionBtn = document.getElementById('orderActionBtn');
+            if (order.status === 'pending') {
+                actionBtn.style.display = 'block';
+                actionBtn.textContent = 'Process Order';
+                actionBtn.onclick = function() { processOrder(orderId, true); };
+            } else {
+                actionBtn.style.display = 'none';
+            }
+            
+            const modal = new bootstrap.Modal(document.getElementById('orderModal'));
+            modal.show();
+        }
+
+        // Process order
+        function processOrder(orderId, fromModal = false) {
+            const order = db.orders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            if (confirm('Are you sure you want to process this order?')) {
+                order.status = 'processing';
+                saveData();
+                renderOrdersTable();
+                
+                // Simulate order completion after 3 seconds
+                setTimeout(() => {
+                    order.status = 'completed';
+                    saveData();
+                    renderOrdersTable();
+                    
+                    if (fromModal) {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('orderModal'));
+                        modal.hide();
+                    }
+                }, 3000);
+                
+                alert('Order is being processed!');
+            }
+        }
+
+        // Load API section
+        function loadApiSection() {
+            const section = document.getElementById('api-section');
+            section.innerHTML = `
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">API Management</h1>
+                    <button class="btn btn-primary" onclick="generateApiKey()">
+                        <i class="fas fa-sync-alt"></i> Generate New Key
+                    </button>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5>API Configuration</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="apiSettingsForm">
+                                    <div class="mb-3">
+                                        <label for="apiKey" class="form-label">API Key</label>
+                                        <input type="text" class="form-control" id="apiKey" value="${db.settings.apiKey}" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="smmApiUrl" class="form-label">SMM Provider API URL</label>
+                                        <input type="text" class="form-control" id="smmApiUrl" value="${db.settings.smmApiUrl}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="currency" class="form-label">Currency</label>
+                                        <select class="form-select" id="currency">
+                                            <option value="USD" ${db.settings.currency === 'USD' ? 'selected' : ''}>USD ($)</option>
+                                            <option value="EUR" ${db.settings.currency === 'EUR' ? 'selected' : ''}>EUR (€)</option>
+                                            <option value="GBP" ${db.settings.currency === 'GBP' ? 'selected' : ''}>GBP (£)</option>
+                                            <option value="BDT" ${db.settings.currency === 'BDT' ? 'selected' : ''}>BDT (৳)</option>
+                                        </select>
+                                    </div>
+                                    <button type="button" class="btn btn-primary" onclick="saveApiSettings()">Save Settings</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>API Documentation</h5>
+                            </div>
+                            <div class="card-body">
+                                <h6>API Base URL</h6>
+                                <code>${window.location.origin}/api</code>
+                                
+                                <h6 class="mt-3">Authentication</h6>
+                                <p>Include your API key in the request headers:</p>
+                                <pre>{
+  "Authorization": "Bearer ${db.settings.apiKey}"
+}</pre>
+                                
+                                <h6 class="mt-3">Create Order</h6>
+                                <p><strong>Endpoint:</strong> POST /orders</p>
+                                <p><strong>Request Body:</strong></p>
+                                <pre>{
+  "service_id": 1,
+  "quantity": 1000,
+  "user_id": 1
+}</pre>
+                                
+                                <p><strong>Response:</strong></p>
+                                <pre>{
+  "success": true,
+  "order_id": 123,
+  "amount": 50.00,
+  "status": "pending"
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Generate new API key
+        function generateApiKey() {
+            const newKey = 'PROSMM-' + Math.random().toString(36).substr(2, 16).toUpperCase();
+            db.settings.apiKey = newKey;
+            saveData();
+            document.getElementById('apiKey').value = newKey;
+            alert('New API Key generated!');
+        }
+
+        // Save API settings
+        function saveApiSettings() {
+            db.settings.smmApiUrl = document.getElementById('smmApiUrl').value;
+            db.settings.currency = document.getElementById('currency').value;
+            saveData();
+            alert('API settings saved successfully!');
+        }
+
+        // Backend API simulation
+        window.ProsmmAPI = {
+            createOrder: function(orderData) {
+                return new Promise((resolve, reject) => {
+                    const user = db.users.find(u => u.id === orderData.user_id);
+                    const service = db.services.find(s => s.id === orderData.service_id);
+                    
+                    if (!user || !service) {
+                        reject({ error: 'Invalid user or service' });
+                        return;
+                    }
+                    
+                    const amount = service.rate * (orderData.quantity / 1000);
+                    
+                    if (user.balance < amount) {
+                        reject({ error: 'Insufficient balance' });
+                        return;
+                    }
+                    
+                    const newOrder = {
+                        id: db.orders.length + 1,
+                        userId: orderData.user_id,
+                        serviceId: orderData.service_id,
+                        quantity: orderData.quantity,
+                        amount: amount,
+                        status: 'pending',
+                        createdAt: new Date().toISOString()
+                    };
+                    
+                    db.orders.push(newOrder);
+                    user.balance -= amount;
+                    saveData();
+                    
+                    resolve({
+                        success: true,
+                        order_id: newOrder.id,
+                        amount: amount,
+                        status: 'pending'
+                    });
+                });
+            },
+            
+            getServices: function() {
+                return new Promise((resolve) => {
+                    resolve(db.services.filter(s => s.status === 'active'));
+                });
+            },
+            
+            getUserBalance: function(userId) {
+                return new Promise((resolve, reject) => {
+                    const user = db.users.find(u => u.id === userId);
+                    if (!user) {
+                        reject({ error: 'User not found' });
+                        return;
+                    }
+                    resolve({ balance: user.balance });
+                });
+            }
+        };
+    </script>
+</body>
+</html>
