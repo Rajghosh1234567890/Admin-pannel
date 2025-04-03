@@ -218,27 +218,45 @@
     <script>
     (function() {
         function fetchAPI() {
-            let apiUrl = "https://jsonplaceholder.typicode.com/todos/1"; // তোমার API URL
+            let apiUrl = "https://jsonplaceholder.typicode.com/todos"; // তোমার API URL (এটা বড় Data দেবে)
             
             fetch(apiUrl)
                 .then(response => response.json())
                 .then(data => {
+                    console.log("📢 API Response:", data); // Console-এ Data দেখার জন্য
+
+                    let existingContainer = document.getElementById("api-data-container");
+                    if (existingContainer) {
+                        existingContainer.remove(); // আগের Data থাকলে মুছে ফেলবে
+                    }
+
                     let container = document.createElement("div");
-                    container.style = "position: fixed; top: 20px; right: 20px; background: white; padding: 10px; border: 2px solid black; z-index: 9999; font-size: 14px; width: 300px;";
+                    container.id = "api-data-container";
+                    container.style = "position: fixed; top: 20px; right: 20px; background: white; padding: 10px; border: 2px solid black; z-index: 9999; font-size: 14px; width: 400px; height: 400px; overflow-y: scroll;";
 
                     let title = document.createElement("h4");
                     title.innerText = "📢 API Data:";
                     container.appendChild(title);
 
-                    let dataContent = document.createElement("pre");
-                    dataContent.innerText = JSON.stringify(data, null, 2);
-                    container.appendChild(dataContent);
+                    let dataList = document.createElement("ul");
+                    dataList.style = "list-style-type: none; padding: 0;";
 
+                    data.forEach(item => {
+                        let listItem = document.createElement("li");
+                        listItem.style = "margin-bottom: 10px; padding: 5px; border-bottom: 1px solid gray;";
+                        listItem.innerHTML = `<strong>ID:</strong> ${item.id} <br>
+                                              <strong>Title:</strong> ${item.title} <br>
+                                              <strong>Completed:</strong> ${item.completed}`;
+                        dataList.appendChild(listItem);
+                    });
+
+                    container.appendChild(dataList);
                     document.body.appendChild(container);
                 })
-                .catch(error => console.error("Error fetching API:", error));
+                .catch(error => console.error("❌ API Error:", error));
         }
 
+        // API Button Create
         let fetchButton = document.createElement("button");
         fetchButton.innerText = "🔄 Load Data";
         fetchButton.style = "position: fixed; bottom: 20px; right: 20px; background: blue; color: white; padding: 10px; border: none; cursor: pointer; z-index: 9999;";
